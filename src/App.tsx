@@ -9,6 +9,7 @@ import {
   Tabs,
   Toolbar,
   JsonContent,
+  FullscreenButton,
 } from './components'
 import './index.css'
 
@@ -129,54 +130,63 @@ const App: React.FC = () => {
     return shouldExpandAll
   }, [shouldExpandAll])
 
-  if (state.type === 'no-url') {
-    return <NoUrlMessage />
-  }
+  const renderBody = () => {
+    if (state.type === 'no-url') {
+      return <NoUrlMessage />
+    }
 
-  if (state.type === 'loading') {
-    return <LoadingMessage url={state.url} />
-  }
+    if (state.type === 'loading') {
+      return <LoadingMessage url={state.url} />
+    }
 
-  if (state.type === 'error') {
-    return <ErrorMessage url={state.url} error={state.error} />
-  }
+    if (state.type === 'error') {
+      return <ErrorMessage url={state.url} error={state.error} />
+    }
 
-  if (activeTab === null) {
-    return <LoadingMessage url={state.url} />
+    if (activeTab === null) {
+      return <LoadingMessage url={state.url} />
+    }
+
+    return (
+      <div className="json-viewer-app">
+        <Tabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          userTheme={userTheme}
+          onThemeChange={handleThemeChange}
+        />
+
+        {activeTab !== 'stac' && (
+          <Toolbar
+            activeTab={activeTab}
+            onSave={handleSave}
+            onCopy={handleCopy}
+            onCollapseAll={handleCollapseAll}
+            onExpandAll={handleExpandAll}
+            isPrettyPrinted={isPrettyPrinted}
+            onTogglePrettyPrint={handlePrettyPrint}
+          />
+        )}
+
+        <JsonContent
+          activeTab={activeTab}
+          data={state.data}
+          jsonText={state.jsonText}
+          url={state.url}
+          theme={jsonTheme}
+          shouldExpandAll={shouldExpandAll}
+          shouldExpandNodeInitially={shouldExpandNodeInitially}
+          isPrettyPrinted={isPrettyPrinted}
+        />
+      </div>
+    )
   }
 
   return (
-    <div className="json-viewer-app">
-      <Tabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        userTheme={userTheme}
-        onThemeChange={handleThemeChange}
-      />
-
-      {activeTab !== 'stac' && (
-        <Toolbar
-          activeTab={activeTab}
-          onSave={handleSave}
-          onCopy={handleCopy}
-          onCollapseAll={handleCollapseAll}
-          onExpandAll={handleExpandAll}
-          isPrettyPrinted={isPrettyPrinted}
-          onTogglePrettyPrint={handlePrettyPrint}
-        />
-      )}
-
-      <JsonContent
-        activeTab={activeTab}
-        data={state.data}
-        jsonText={state.jsonText}
-        url={state.url}
-        theme={jsonTheme}
-        shouldExpandAll={shouldExpandAll}
-        shouldExpandNodeInitially={shouldExpandNodeInitially}
-        isPrettyPrinted={isPrettyPrinted}
-      />
-    </div>
+    <>
+      {renderBody()}
+      <FullscreenButton />
+    </>
   )
 }
 
