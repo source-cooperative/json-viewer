@@ -13,6 +13,12 @@ import {
 } from './components'
 import './index.css'
 
+const parseJsonl = (text: string): unknown[] =>
+  text
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line))
+
 const isStac = (data: unknown): boolean => {
   if (!data || typeof data !== 'object') return false
   const obj = data as Record<string, unknown>
@@ -63,7 +69,13 @@ const App: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
         const text = await response.text()
-        const data = JSON.parse(text)
+        // JSONL/NDJSON: valid JSON parses as-is; otherwise treat as newline-delimited records.
+        let data
+        try {
+          data = JSON.parse(text)
+        } catch {
+          data = parseJsonl(text)
+        }
         setState({ type: 'success', url: jsonUrl, data, jsonText: text })
         setActiveTab((current) => current ?? (isStac(data) ? 'stac' : 'json'))
       })
@@ -95,7 +107,7 @@ const App: React.FC = () => {
     link.href = url
 
     let filename = decodeURIComponent(state.url).split('/').pop() || 'download'
-    if (!/\.json$/.test(filename)) {
+    if (!/\.(json|jsonl|ndjson)$/i.test(filename)) {
       filename += '.json'
     }
 
