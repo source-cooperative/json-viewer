@@ -11,13 +11,11 @@ import {
   JsonContent,
   FullscreenButton,
 } from './components'
+import { load } from './load'
 import './index.css'
 
-const parseJsonl = (text: string): unknown[] =>
-  text
-    .split('\n')
-    .filter((line) => line.trim())
-    .map((line) => JSON.parse(line))
+// Above this size, auto-expanding the whole react-json-tree freezes the tab, so start collapsed.
+const LARGE_TEXT = 2_000_000
 
 const isStac = (data: unknown): boolean => {
   if (!data || typeof data !== 'object') return false
@@ -63,21 +61,29 @@ const App: React.FC = () => {
 
     setState({ type: 'loading', url: jsonUrl })
 
-    fetch(jsonUrl)
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+    load(jsonUrl)
+      .then((result) => {
+        if (result.mode === 'jsonl') {
+          setState({
+            type: 'success',
+            url: jsonUrl,
+            mode: 'jsonl',
+            records: result.records,
+          })
+          setActiveTab((current) => (current === 'raw' ? 'raw' : 'json'))
+          return
         }
-        const text = await response.text()
-        // JSONL/NDJSON: valid JSON parses as-is; otherwise treat as newline-delimited records.
-        let data
-        try {
-          data = JSON.parse(text)
-        } catch {
-          data = parseJsonl(text)
-        }
-        setState({ type: 'success', url: jsonUrl, data, jsonText: text })
-        setActiveTab((current) => current ?? (isStac(data) ? 'stac' : 'json'))
+        setState({
+          type: 'success',
+          url: jsonUrl,
+          mode: 'json',
+          data: result.data,
+          jsonText: result.jsonText,
+        })
+        setShouldExpandAll(result.jsonText.length <= LARGE_TEXT)
+        setActiveTab(
+          (current) => current ?? (isStac(result.data) ? 'stac' : 'json')
+        )
       })
       .catch((error) => {
         setState({
@@ -101,6 +107,19 @@ const App: React.FC = () => {
   const handleSave = () => {
     if (state.type !== 'success') return
 
+    // JSONL records aren't kept as one string (could be GBs) — download straight from the URL.
+    // New tab so a cross-origin navigation can't replace the viewer.
+    if (state.mode === 'jsonl') {
+      const link = document.createElement('a')
+      link.href = state.url
+      link.target = '_blank'
+      link.rel = 'noopener'
+      link.download =
+        decodeURIComponent(state.url).split('/').pop() || 'download'
+      link.click()
+      return
+    }
+
     const blob = new Blob([state.jsonText], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -119,8 +138,17 @@ const App: React.FC = () => {
   const handleCopy = async () => {
     if (state.type !== 'success') return
 
+    // ponytail: JSONL copy is the first 1000 records, not the whole file (which may be huge).
+    const text =
+      state.mode === 'jsonl'
+        ? state.records
+            .slice(0, 1000)
+            .map((r) => JSON.stringify(r))
+            .join('\n')
+        : state.jsonText
+
     try {
-      await navigator.clipboard.writeText(state.jsonText)
+      await navigator.clipboard.writeText(text)
     } catch (err) {
       console.error('Failed to copy:', err)
     }
@@ -159,6 +187,10 @@ const App: React.FC = () => {
       return <LoadingMessage url={state.url} />
     }
 
+    const isJsonl = state.mode === 'jsonl'
+    const tooBigToExpand =
+      state.mode === 'json' && state.jsonText.length > LARGE_TEXT
+
     return (
       <div className="json-viewer-app">
         <Tabs
@@ -166,6 +198,7 @@ const App: React.FC = () => {
           onTabChange={setActiveTab}
           userTheme={userTheme}
           onThemeChange={handleThemeChange}
+          showStac={!isJsonl}
         />
 
         {activeTab !== 'stac' && (
@@ -175,6 +208,7 @@ const App: React.FC = () => {
             onCopy={handleCopy}
             onCollapseAll={handleCollapseAll}
             onExpandAll={handleExpandAll}
+            disableExpandAll={tooBigToExpand}
             isPrettyPrinted={isPrettyPrinted}
             onTogglePrettyPrint={handlePrettyPrint}
           />
@@ -182,8 +216,10 @@ const App: React.FC = () => {
 
         <JsonContent
           activeTab={activeTab}
-          data={state.data}
-          jsonText={state.jsonText}
+          mode={state.mode}
+          data={state.mode === 'json' ? state.data : undefined}
+          jsonText={state.mode === 'json' ? state.jsonText : ''}
+          records={state.mode === 'jsonl' ? state.records : undefined}
           url={state.url}
           theme={jsonTheme}
           shouldExpandAll={shouldExpandAll}

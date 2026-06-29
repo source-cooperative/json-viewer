@@ -8,6 +8,9 @@ dependencies:
   '@openeo/vue-components':
     specifier: ^2.23.4
     version: 2.23.4
+  '@tanstack/react-virtual':
+    specifier: ^3.14.4
+    version: 3.14.4(react-dom@19.2.3)(react@19.2.3)
   react:
     specifier: ^19.2.3
     version: 19.2.3
@@ -750,6 +753,21 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@tanstack/react-virtual@3.14.4(react-dom@19.2.3)(react@19.2.3):
+    resolution: {integrity: sha512-dZzAQP2uCDAd+9sAehqmx/DcU+B91Q4Gb0aDSM7t9bJvWDyGF9sapFNW5r1gNLsHs4wTb6ScZENJeYaHxJLiOw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    dependencies:
+      '@tanstack/virtual-core': 3.17.2
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+    dev: false
+
+  /@tanstack/virtual-core@3.17.2:
+    resolution: {integrity: sha512-w43MvWvmShpb6kIC9MOoLyUkLmRTLPjt61bHWs+X29hACSpX+n8DvgZ3qM7cUfflKlRRcHR9KVJE6TmcqnQvcA==}
+    dev: false
 
   /@types/babel__core@7.20.5:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}

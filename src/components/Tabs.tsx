@@ -6,13 +6,15 @@ interface TabsProps {
   onTabChange: (tab: TabType) => void
   userTheme: ThemeType
   onThemeChange: (theme: string) => void
+  showStac: boolean
 }
 
 export const Tabs: React.FC<TabsProps> = ({
   activeTab,
   onTabChange,
   userTheme,
-  onThemeChange
+  onThemeChange,
+  showStac,
 }) => (
   <div className="tabs">
     <button
@@ -27,12 +29,14 @@ export const Tabs: React.FC<TabsProps> = ({
     >
       Raw Data
     </button>
-    <button
-      className={`tab ${activeTab === 'stac' ? 'active' : ''}`}
-      onClick={() => onTabChange('stac')}
-    >
-      STAC
-    </button>
+    {showStac && (
+      <button
+        className={`tab ${activeTab === 'stac' ? 'active' : ''}`}
+        onClick={() => onTabChange('stac')}
+      >
+        STAC
+      </button>
+    )}
     <div className="tab-spacer"></div>
     <div className="header-right">
       <label htmlFor="theme-select">Theme:</label>
