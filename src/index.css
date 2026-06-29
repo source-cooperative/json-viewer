@@ -195,6 +195,7 @@ body {
 .content {
   flex: 1;
   overflow: auto;
+  position: relative;
 }
 
 .json-content {
@@ -207,9 +208,12 @@ body {
   padding-left: 12px !important;
 }
 
-/* JSONL virtualized list */
+/* JSONL virtualized list. Absolute-fill so the scroll viewport has a real
+   bounded height (a height:100% chain off a flex item doesn't resolve, which
+   makes the virtualizer think everything is visible and render every row). */
 .jsonl-view {
-  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: auto;
   font-family: 'Berkeley Mono', Menlo, Consolas, monospace;
   font-size: 13px;
