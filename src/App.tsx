@@ -11,6 +11,7 @@ import {
   JsonContent,
   FullscreenButton,
 } from './components'
+import { hasPreviewableAssets } from './components/StacPreview'
 import './index.css'
 
 const parseJsonl = (text: string): unknown[] =>
@@ -77,7 +78,12 @@ const App: React.FC = () => {
           data = parseJsonl(text)
         }
         setState({ type: 'success', url: jsonUrl, data, jsonText: text })
-        setActiveTab((current) => current ?? (isStac(data) ? 'stac' : 'json'))
+        setActiveTab((current) => {
+          if (current) return current
+          if (isStac(data) && hasPreviewableAssets(data)) return 'preview'
+          if (isStac(data)) return 'stac'
+          return 'json'
+        })
       })
       .catch((error) => {
         setState({
@@ -159,6 +165,8 @@ const App: React.FC = () => {
       return <LoadingMessage url={state.url} />
     }
 
+    const hasPreview = isStac(state.data) && hasPreviewableAssets(state.data)
+
     return (
       <div className="json-viewer-app">
         <Tabs
@@ -166,9 +174,10 @@ const App: React.FC = () => {
           onTabChange={setActiveTab}
           userTheme={userTheme}
           onThemeChange={handleThemeChange}
+          hasPreview={hasPreview}
         />
 
-        {activeTab !== 'stac' && (
+        {activeTab !== 'stac' && activeTab !== 'preview' && (
           <Toolbar
             activeTab={activeTab}
             onSave={handleSave}

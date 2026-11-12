@@ -6,13 +6,15 @@ interface TabsProps {
   onTabChange: (tab: TabType) => void
   userTheme: ThemeType
   onThemeChange: (theme: string) => void
+  hasPreview?: boolean
 }
 
 export const Tabs: React.FC<TabsProps> = ({
   activeTab,
   onTabChange,
   userTheme,
-  onThemeChange
+  onThemeChange,
+  hasPreview,
 }) => (
   <div className="tabs">
     <button
@@ -33,6 +35,14 @@ export const Tabs: React.FC<TabsProps> = ({
     >
       STAC
     </button>
+    {hasPreview && (
+      <button
+        className={`tab ${activeTab === 'preview' ? 'active' : ''}`}
+        onClick={() => onTabChange('preview')}
+      >
+        Preview
+      </button>
+    )}
     <div className="tab-spacer"></div>
     <div className="header-right">
       <label htmlFor="theme-select">Theme:</label>

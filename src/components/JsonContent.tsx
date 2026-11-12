@@ -2,6 +2,7 @@ import React from 'react'
 import { JSONTree } from 'react-json-tree'
 import type { TabType } from '../types'
 import { OpenEOViewer } from './OpenEOViewer'
+import { StacPreview } from './StacPreview'
 
 interface JsonContentProps {
   activeTab: TabType
@@ -51,6 +52,7 @@ export const JsonContent: React.FC<JsonContentProps> = ({
         </div>
       )}
       {activeTab === 'stac' && <OpenEOViewer url={url} />}
+      {activeTab === 'preview' && <StacPreview data={data} />}
     </div>
   )
 }
