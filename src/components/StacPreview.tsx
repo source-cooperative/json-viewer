@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { CogPreview } from './CogPreview'
 
 const SIMPLE_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif']
 const SIMPLE_IMAGE_EXT = /\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i
@@ -94,6 +95,12 @@ export const StacPreview: React.FC<StacPreviewProps> = ({ data }) => {
             {simple && href && (
               <div className="asset-image-preview">
                 <AssetImage src={href} alt={title} />
+              </div>
+            )}
+
+            {!simple && href && (
+              <div className="asset-image-preview">
+                <CogPreview href={href} />
               </div>
             )}
 
