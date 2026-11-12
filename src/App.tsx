@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useMedia } from 'react-use'
 import type { AppState, TabType, ThemeType } from './types'
 import { lightTheme, darkTheme } from './themes'
@@ -148,6 +148,11 @@ const App: React.FC = () => {
     return shouldExpandAll
   }, [shouldExpandAll])
 
+  const hasPreview = useMemo(
+    () => state.type === 'success' && isStac(state.data) && hasPreviewableAssets(state.data),
+    [state]
+  )
+
   const renderBody = () => {
     if (state.type === 'no-url') {
       return <NoUrlMessage />
@@ -165,21 +170,22 @@ const App: React.FC = () => {
       return <LoadingMessage url={state.url} />
     }
 
-    const hasPreview = isStac(state.data) && hasPreviewableAssets(state.data)
+    // Guard against stale ?tab=preview when data has no previewable assets
+    const resolvedTab = activeTab === 'preview' && !hasPreview ? 'json' : activeTab
 
     return (
       <div className="json-viewer-app">
         <Tabs
-          activeTab={activeTab}
+          activeTab={resolvedTab}
           onTabChange={setActiveTab}
           userTheme={userTheme}
           onThemeChange={handleThemeChange}
           hasPreview={hasPreview}
         />
 
-        {activeTab !== 'stac' && activeTab !== 'preview' && (
+        {resolvedTab !== 'stac' && resolvedTab !== 'preview' && (
           <Toolbar
-            activeTab={activeTab}
+            activeTab={resolvedTab}
             onSave={handleSave}
             onCopy={handleCopy}
             onCollapseAll={handleCollapseAll}
@@ -190,7 +196,7 @@ const App: React.FC = () => {
         )}
 
         <JsonContent
-          activeTab={activeTab}
+          activeTab={resolvedTab}
           data={state.data}
           jsonText={state.jsonText}
           url={state.url}

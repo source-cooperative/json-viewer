@@ -1,4 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+const SIMPLE_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif']
+const SIMPLE_IMAGE_EXT = /\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i
+const ANY_IMAGE_EXT = /\.(tif|tiff|png|jpg|jpeg|webp|gif)(\?.*)?$/i
 
 function isImageAsset(asset: unknown): boolean {
   if (!asset || typeof asset !== 'object') return false
@@ -9,9 +13,15 @@ function isImageAsset(asset: unknown): boolean {
 
   if (type.startsWith('image/')) return true
   if (roles.some((r) => ['visual', 'overview', 'thumbnail'].includes(r))) return true
-  if (/\.(tif|tiff|png|jpg|jpeg|webp)(\?.*)?$/i.test(href)) return true
+  if (ANY_IMAGE_EXT.test(href)) return true
 
   return false
+}
+
+function isSimpleImage(a: Record<string, unknown>): boolean {
+  const type = typeof a.type === 'string' ? a.type.toLowerCase() : ''
+  const href = typeof a.href === 'string' ? a.href : ''
+  return SIMPLE_IMAGE_TYPES.some((t) => type.startsWith(t)) || SIMPLE_IMAGE_EXT.test(href)
 }
 
 function getSourceCoopUrl(href: string): string | null {
@@ -24,23 +34,19 @@ function getSourceCoopUrl(href: string): string | null {
   return null
 }
 
-function isSimpleImage(a: Record<string, unknown>): boolean {
-  const type = typeof a.type === 'string' ? a.type.toLowerCase() : ''
-  const href = typeof a.href === 'string' ? a.href : ''
-  return (
-    type.startsWith('image/png') ||
-    type.startsWith('image/jpeg') ||
-    type.startsWith('image/webp') ||
-    type.startsWith('image/gif') ||
-    /\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(href)
-  )
-}
-
 export function hasPreviewableAssets(data: unknown): boolean {
   if (!data || typeof data !== 'object') return false
   const assets = (data as Record<string, unknown>).assets
   if (!assets || typeof assets !== 'object') return false
   return Object.values(assets as Record<string, unknown>).some(isImageAsset)
+}
+
+function AssetImage({ src, alt }: { src: string; alt: string }) {
+  const [errored, setErrored] = useState(false)
+  if (errored) {
+    return <div className="asset-image-error">Image could not be loaded.</div>
+  }
+  return <img src={src} alt={alt} onError={() => setErrored(true)} />
 }
 
 interface StacPreviewProps {
@@ -87,7 +93,7 @@ export const StacPreview: React.FC<StacPreviewProps> = ({ data }) => {
 
             {simple && href && (
               <div className="asset-image-preview">
-                <img src={href} alt={title} />
+                <AssetImage src={href} alt={title} />
               </div>
             )}
 

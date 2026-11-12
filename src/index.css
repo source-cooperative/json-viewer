@@ -397,6 +397,12 @@ body {
   border-radius: 3px;
 }
 
+.asset-image-error {
+  font-size: 12px;
+  opacity: 0.6;
+  padding: 8px 0;
+}
+
 .asset-actions {
   padding: 10px 14px;
   display: flex;
