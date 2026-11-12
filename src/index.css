@@ -310,6 +310,158 @@ body {
   line-height: 1.8;
 }
 
+/* STAC Preview */
+.stac-preview {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-empty {
+  padding: 40px;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.asset-card {
+  border-radius: 6px;
+  border: 1px solid;
+  overflow: hidden;
+}
+
+[data-theme='light'] .asset-card {
+  border-color: #ddd;
+  background-color: #fafafa;
+}
+
+[data-theme='dark'] .asset-card {
+  border-color: #444;
+  background-color: #252525;
+}
+
+.asset-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid;
+}
+
+[data-theme='light'] .asset-header {
+  border-bottom-color: #ddd;
+  background-color: #f0f0f0;
+}
+
+[data-theme='dark'] .asset-header {
+  border-bottom-color: #444;
+  background-color: #2d2d2d;
+}
+
+.asset-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.asset-roles {
+  font-size: 11px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.asset-type {
+  font-size: 11px;
+  font-family: "Berkeley Mono", Menlo, Consolas, monospace;
+  opacity: 0.6;
+  margin-left: auto;
+}
+
+.asset-image-preview {
+  padding: 12px 14px;
+  border-bottom: 1px solid;
+}
+
+[data-theme='light'] .asset-image-preview {
+  border-bottom-color: #ddd;
+}
+
+[data-theme='dark'] .asset-image-preview {
+  border-bottom-color: #444;
+}
+
+.asset-image-preview img {
+  max-width: 100%;
+  max-height: 400px;
+  display: block;
+  border-radius: 3px;
+}
+
+.asset-image-error {
+  font-size: 12px;
+  opacity: 0.6;
+  padding: 8px 0;
+}
+
+.cog-preview {
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.cog-status {
+  font-size: 12px;
+  opacity: 0.6;
+  padding: 8px 0;
+}
+
+.cog-error {
+  color: #d32f2f;
+  opacity: 1;
+}
+
+[data-theme='dark'] .cog-error {
+  color: #ff6b6b;
+}
+
+.asset-actions {
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.asset-btn {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-theme='light'] .asset-btn {
+  border-color: #0066cc;
+  color: #0066cc;
+  background-color: transparent;
+}
+
+[data-theme='light'] .asset-btn:hover {
+  background-color: #0066cc;
+  color: #fff;
+}
+
+[data-theme='dark'] .asset-btn {
+  border-color: #4dabf7;
+  color: #4dabf7;
+  background-color: transparent;
+}
+
+[data-theme='dark'] .asset-btn:hover {
+  background-color: #4dabf7;
+  color: #1e1e1e;
+}
+
 /* Fullscreen button */
 .fullscreen-button {
   position: fixed;
